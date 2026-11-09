@@ -6,6 +6,14 @@
 
 Intent turns customer evidence into reviewable next steps, then connects approved work to verifiable outcomes. Its assistant keeps private conversation history, cites customer sources, and helps people decide what to do next. Business changes remain explicit, permission-checked commands.
 
+## See Intent in action
+
+[![Watch the Intent product overview (1:18)](https://zerothlab.github.io/intent-crm-website/assets/videos/overview-poster.jpg)](https://zerothlab.github.io/intent-crm-website/#product-demo)
+
+[Watch the product overview (1:18)](https://zerothlab.github.io/intent-crm-website/#product-demo) · [Getting-started tutorial (2:55)](https://zerothlab.github.io/intent-crm-website/#tutorial)
+
+Both videos offer English and Simplified Chinese narration and captions on the website. Actual application footage uses fictional data, the Fixture model, and simulated delivery.
+
 ## From evidence to outcomes
 
 1. Create a customer and import meeting notes, correspondence, or customer feedback.
