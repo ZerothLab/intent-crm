@@ -6,10 +6,36 @@ For an existing installation, read [Upgrades and data preservation](upgrade.md) 
 
 ## Prerequisites
 
-- Docker Engine and Compose v2, plus access to your organization's application image. `your-namespace/intent-crm` is a placeholder, not a published image claim.
+- Docker Engine and Compose v2, plus access to the [published Intent image](https://hub.docker.com/r/zerothlab/intent-crm).
 - PostgreSQL 16, provided by the production Compose file with an external persistent volume. The database port is not published to the host.
 - A persistent Temporal service on a protected internal endpoint and an existing namespace. The development CLI is not a production service. This distribution does not configure Temporal mTLS or API-key authentication; do not point it at a service requiring either without adding that integration.
 - An HTTPS reverse proxy serving the web application and `/api` on the same origin. The default host binding is `127.0.0.1:3100`. A proxy in another container needs an explicitly reachable network address.
+
+## Get the release
+
+The current published version is [v0.4.0-rc.1](https://github.com/ZerothLab/intent-crm/releases/tag/v0.4.0-rc.1), a prerelease for evaluation before production adoption. Its image supports `linux/amd64` and `linux/arm64`. Obtain the matching deployment files and application image:
+
+```sh
+git clone --branch v0.4.0-rc.1 --depth 1 https://github.com/ZerothLab/intent-crm.git
+cd intent-crm
+docker pull zerothlab/intent-crm:0.4.0-rc.1
+```
+
+Set `INTENT_IMAGE=zerothlab/intent-crm:0.4.0-rc.1` in `.env.docker`. To pin the verified multi-architecture image immutably, use this value instead:
+
+```dotenv
+INTENT_IMAGE=zerothlab/intent-crm@sha256:bdc1acfe1544b2adefb36f6fa59102a76fc68b7f7375cd342fd86ad1bee4537b
+```
+
+### Optional: build your own image
+
+For a customized installation, build from the checked-out source:
+
+```sh
+docker build -t intent-crm:local .
+```
+
+Set `INTENT_IMAGE=intent-crm:local` and use `docker compose --env-file .env.docker -f compose.production.yaml pull postgres` instead of pulling the application image in the steps below. This local image contains your checked-out source and changes; validate it before use.
 
 ## Configure the installation
 
