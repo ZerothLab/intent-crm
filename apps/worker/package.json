@@ -15,13 +15,13 @@
     "@intent/database": "workspace:*",
     "@intent/domain": "workspace:*",
     "@intent/harness": "workspace:*",
-    "@temporalio/client": "1.24.0",
-    "@temporalio/common": "1.24.0",
-    "@temporalio/worker": "1.24.0",
-    "@temporalio/workflow": "1.24.0"
+    "@temporalio/client": "1.25.0",
+    "@temporalio/common": "1.25.0",
+    "@temporalio/worker": "1.25.0",
+    "@temporalio/workflow": "1.25.0"
   },
   "devDependencies": {
-    "@temporalio/testing": "1.24.0"
+    "@temporalio/testing": "1.25.0"
   },
   "license": "Apache-2.0"
 }
