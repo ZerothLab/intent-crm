@@ -2,6 +2,8 @@
 
 **The AI-native CRM. Understand intent. Move business forward.**
 
+[Website](https://zerothlab.github.io/intent-crm/) · [v0.4.0-rc.1 prerelease](https://github.com/ZerothLab/intent-crm/releases/tag/v0.4.0-rc.1) · [Docker Hub](https://hub.docker.com/r/zerothlab/intent-crm)
+
 Intent turns customer evidence into reviewable next steps, then connects approved work to verifiable outcomes. Its assistant keeps private conversation history, cites customer sources, and helps people decide what to do next. Business changes remain explicit, permission-checked commands.
 
 ## From evidence to outcomes
@@ -30,15 +32,15 @@ A delivered message is evidence of delivery. Customer consent, a signed contract
 
 Intent is self-hosted. You will need Docker Engine and Compose v2, a persistent Temporal service, and an HTTPS reverse proxy. PostgreSQL 16 is included in the production Compose configuration.
 
-Build an application image from this repository:
+Start with **v0.4.0-rc.1**, a release candidate for evaluation, and its published application image. The image supports `linux/amd64` and `linux/arm64`:
 
 ```sh
-git clone https://github.com/ZerothLab/intent-crm.git
+git clone --branch v0.4.0-rc.1 --depth 1 https://github.com/ZerothLab/intent-crm.git
 cd intent-crm
-docker build -t intent-crm:0.4.0 .
+docker pull zerothlab/intent-crm:0.4.0-rc.1
 ```
 
-Follow the [deployment guide](docs/deployment.md) to configure the installation and initialize an administrator. For this locally built image, set `INTENT_IMAGE=intent-crm:0.4.0` in `.env.docker` and skip pulling the application image. A production installation also needs the Temporal endpoint and HTTPS origin described in that guide. Then use the [product guide](docs/product-guide.md) to configure the workspace and complete a customer workflow.
+Follow the [deployment guide](docs/deployment.md) to configure the installation and initialize an administrator. Set `INTENT_IMAGE=zerothlab/intent-crm:0.4.0-rc.1` in `.env.docker`; the guide also provides an immutable digest and an optional source-build path. A production installation needs the Temporal endpoint and HTTPS origin described in that guide. Then use the [product guide](docs/product-guide.md) to configure the workspace and complete a customer workflow.
 
 Model setup is available at **Manage → Model settings**. Review role permissions and security changes at **Manage → Access and audit**. Customer delivery and execution health are at **Manage → Delivery and runtime**. The [integration guide](docs/integrations.md) describes provider configuration and the gateway contract. Existing installations should follow the [upgrade guide](docs/upgrade.md).
 

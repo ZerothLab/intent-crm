@@ -31,4 +31,5 @@
 **/.DS_Store
 coverage
 docs/screenshots
+website
 docker/secrets
