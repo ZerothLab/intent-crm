@@ -1,0 +1,43 @@
+name: Bug report
+description: Report a reproducible problem in Intent.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues first. Do not include credentials, customer data, environment files, or database dumps.
+        Report security vulnerabilities privately through the repository's Security tab.
+  - type: input
+    id: version
+    attributes:
+      label: Commit or image digest
+      description: Identify the exact revision you are running.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Deployment method, operating system, browser, and relevant service versions. Omit private hostnames and credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide a minimal example with fictional records.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include relevant redacted errors or screenshots, if useful.
+    validations:
+      required: true

@@ -1,0 +1,32 @@
+.workspace-settings-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(270px,.8fr);gap:24px;align-items:start}
+.workspace-basics,.workspace-settings-aside{min-width:0}
+.workspace-settings-form{padding:26px 28px 0}
+.workspace-identity{display:flex;align-items:center;gap:14px;margin-bottom:27px;min-width:0}
+.workspace-identity>div{min-width:0}.workspace-identity strong{display:block;font-size:18px;line-height:1.6;overflow-wrap:anywhere}
+.workspace-identity>div>span{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
+.workspace-section-icon{display:grid;place-items:center;flex-shrink:0;width:44px;height:44px;border-radius:12px;background:var(--primary-soft);color:var(--primary)}
+.workspace-settings-form>label{display:block;font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:8px}
+.workspace-settings-form>input,.workspace-id-control>input{font-size:14px;min-height:43px}
+.workspace-settings-form>.workspace-field-help{font-size:12px;color:var(--muted);line-height:1.85;margin:9px 0 24px}
+.workspace-id-control{display:flex;gap:8px;align-items:stretch;min-width:0}
+.workspace-id-control>input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;flex:1;min-width:0}
+.workspace-id-control>.button{flex-shrink:0;box-shadow:none}
+.workspace-settings-form>.workspace-copy-status{margin:-12px 0 20px;color:var(--primary);font-size:12px;line-height:1.8}
+.workspace-settings-form>.save-note{margin-bottom:20px}
+.workspace-form-footer{border-top:1px solid var(--line);padding:20px 0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.workspace-form-footer>p{font-size:11px;color:var(--muted)}
+.workspace-form-footer>div{display:flex;gap:9px;margin-left:auto}.workspace-form-footer>.button{white-space:normal;line-height:1.6}
+.workspace-team-summary{padding:26px}.workspace-team-summary h2{margin:19px 0 9px;font-size:16px}.workspace-team-summary>p{font-size:13px;line-height:1.9;color:var(--muted)}
+.workspace-member-stats{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:23px 0;margin-bottom:20px;border-bottom:1px solid var(--line)}
+.workspace-member-stats>div+div{padding-left:20px;border-left:1px solid var(--line)}
+.workspace-member-stats dt{font-size:12px;color:var(--muted)}.workspace-member-stats dd{font-size:30px;line-height:1.4;font-weight:500;font-variant-numeric:tabular-nums;margin-top:7px;color:var(--ink)}.workspace-member-stats dd span{font-size:12px;color:var(--muted);font-weight:400;margin-left:7px}
+.workspace-boundary-note{display:flex;align-items:flex-start;gap:11px;padding:22px 5px;color:var(--muted)}.workspace-boundary-note svg{margin-top:3px}.workspace-boundary-note strong{font-size:12px;font-weight:500;color:var(--text-secondary)}.workspace-boundary-note p{font-size:12px;line-height:1.9;margin-top:6px}
+.workspace-configuration{margin-top:32px}.workspace-section-heading{display:flex;justify-content:space-between;gap:15px;align-items:baseline;flex-wrap:wrap;margin-bottom:15px}.workspace-section-heading h2{font-size:15px}.workspace-section-heading>span{font-size:12px;color:var(--muted)}
+.workspace-setting-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.workspace-setting-links>a{display:flex;align-items:center;gap:12px;padding:21px 18px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--ink);min-width:0}
+.workspace-setting-links>a:hover{border-color:var(--primary-border);background:var(--nav)}.workspace-setting-links>a>div{min-width:0;flex:1}.workspace-setting-links>a>svg{color:var(--muted)}.workspace-setting-links h3{font-size:13px;font-weight:600;line-height:1.65}.workspace-setting-links p{font-size:11px;color:var(--muted);line-height:1.85;margin-top:4px}.workspace-setting-links .workspace-section-icon{width:36px;height:36px;border-radius:9px}
+.workspace-creation-guide{font-size:13px;line-height:1.9}.workspace-creation-context{display:flex;gap:10px;padding:14px 16px;border-radius:8px;background:var(--fog);color:var(--text-secondary);margin-bottom:23px}.workspace-creation-context svg{color:var(--primary);margin-top:3px}
+.workspace-creation-guide ol{padding-left:22px;margin:0}.workspace-creation-guide li{padding-left:3px;margin-bottom:18px}.workspace-creation-guide li::marker{font-size:12px;color:var(--primary);font-weight:600}.workspace-creation-guide li>strong{font-size:13px}.workspace-creation-guide li>p{font-size:12px;color:var(--muted);margin-top:6px;overflow-wrap:anywhere}
+.workspace-creation-guide>textarea{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.8;resize:none;background:var(--fog);color:var(--text-secondary)}
+.workspace-command-copy{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:10px 0 24px}.workspace-command-copy>span{font-size:12px;line-height:1.7;color:var(--primary);flex:1;min-width:0}.workspace-command-copy>.button{flex-shrink:0}
+@media(max-width:1100px){.workspace-settings-layout{grid-template-columns:minmax(0,1fr)}.workspace-settings-aside{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}.workspace-setting-links{grid-template-columns:1fr}.workspace-setting-links>a{padding:18px 21px}.workspace-setting-links p{font-size:12px}.workspace-boundary-note{padding:15px 0}}
+@media(max-width:760px){.workspace-settings-form{padding:22px 20px 0}.workspace-settings-layout{gap:18px}.workspace-settings-aside{grid-template-columns:1fr;gap:0}.workspace-identity strong{font-size:17px}.workspace-settings-form>label{font-size:14px}.workspace-settings-form>input,.workspace-id-control>input{font-size:16px;min-height:45px}.workspace-settings-form>.workspace-field-help,.workspace-settings-form>.workspace-copy-status{font-size:13px}.workspace-team-summary{padding:23px}.workspace-form-footer>p{font-size:12px}.workspace-form-footer>div{width:100%;justify-content:flex-end}.workspace-boundary-note{padding:20px 5px}.workspace-boundary-note strong,.workspace-boundary-note p{font-size:13px}.workspace-section-heading>span{font-size:12px}.workspace-setting-links h3{font-size:14px}.workspace-setting-links p{font-size:13px}.workspace-creation-guide li>strong{font-size:14px}.workspace-creation-guide li>p,.workspace-creation-guide>textarea{font-size:13px}.workspace-command-copy{align-items:flex-start}.workspace-command-copy>.button{white-space:nowrap}}

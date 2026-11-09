@@ -1,0 +1,24 @@
+import { z } from 'zod';
+import type { AdvancementProposal, ChatReply, Customer, Fact, IntentAction, OpportunityTask, PlanningRun } from './index.js';
+
+const id = z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/);
+export const passwordValue = z.string().min(12).max(128);
+export const loginInput = z.object({workspaceId:id,email:z.email().max(254),password:z.string().min(1).max(128)}).strict();
+export const setPasswordInput = z.object({password:passwordValue}).strict();
+export const changePasswordInput = z.object({currentPassword:z.string().min(1).max(128),newPassword:passwordValue}).strict();
+export type AuthMode = {mode:'development'|'password';demo:boolean;passwordMinLength:12};
+export const customerInput = z.object({name:z.string().trim().min(2).max(160),industry:z.string().trim().min(1).max(100),contact:z.string().trim().min(1).max(100),email:z.email().max(254),ownerId:id}).strict();
+export const customerUpdateInput = customerInput.extend({expectedRevision:z.number().int().positive(),note:z.string().trim().min(3).max(1000)}).strict();
+export const factReviewInput = z.object({expectedRevision:z.number().int().positive(),status:z.enum(['confirmed','rejected']),note:z.string().trim().min(3).max(1000)}).strict();
+export type FactReview = {id:string;factId:string;revision:number;fromStatus:Fact['status'];toStatus:'confirmed'|'rejected';note:string;actorId:string;actorName:string;createdAt:string};
+export const retryRunInput = z.object({reason:z.string().trim().min(3).max(1000)}).strict();
+export type ProductRun = PlanningRun & {parentRunId:string|null;attempt:number;retryReason:string|null;successorRunId:string|null};
+export type WorkInbox = {asOf:string;facts:Fact[];tasks:(OpportunityTask & {opportunityTitle:string;customerId:string})[];actions:IntentAction[];runs:ProductRun[];advancements:(AdvancementProposal & {opportunityTitle:string})[];customers:Pick<Customer,'id'|'name'>[]};
+export const conversationInput = z.object({customerId:id,title:z.string().trim().min(1).max(100)}).strict();
+export const conversationQuery = z.object({customerId:id.optional(),cursor:id.optional()}).strict();
+export const conversationDetailQuery = z.object({before:id.optional()}).strict();
+export const conversationMessageInput = z.object({requestId:z.uuid(),message:z.string().trim().min(1).max(2000),locale:z.enum(['en','zh-CN']).default('en')}).strict();
+export type Conversation = {id:string;customerId:string;title:string;createdAt:string;updatedAt:string};
+export type ChatTurn = {id:string;requestId:string;message:string;reply:ChatReply;createdAt:string};
+export type ConversationPage = {items:Conversation[];nextCursor:string|null};
+export type ConversationDetail = {conversation:Conversation;turns:ChatTurn[];olderCursor:string|null};

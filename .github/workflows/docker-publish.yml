@@ -1,0 +1,170 @@
+name: Docker build and publish
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      push:
+        description: Publish edge and sha tags (requires repository opt-in; default branch only)
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: PostgreSQL and Temporal tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-bookworm
+        env:
+          POSTGRES_DB: intent_crm_ci
+          POSTGRES_USER: intent_ci
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U intent_ci -d intent_crm_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL: postgresql://intent_ci:ci-only-password@127.0.0.1:5432/intent_crm_ci
+      INTENT_TEMPORAL_TESTS: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Verify publication policy
+        run: node --test scripts/ci-image-tags.test.mjs
+      - name: Install dependencies
+        run: |
+          npm install --global pnpm@10.4.1
+          pnpm install --frozen-lockfile --prod=false
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Audit runtime and build dependencies
+        run: pnpm audit --audit-level=high
+      - name: Run all tests with real PostgreSQL and Temporal
+        # runtime.test.ts starts and tears down the real local Temporal server.
+        # No application worker runs alongside these isolated integration tests.
+        run: |
+          set -o pipefail
+          node --import tsx --test --test-reporter=tap --test-concurrency=1 tests/*.test.ts apps/web/test/*.test.ts | tee "$RUNNER_TEMP/intent-tests.tap"
+          node scripts/ci-check-tests.mjs "$RUNNER_TEMP/intent-tests.tap"
+      - name: Build
+        run: pnpm build
+
+  image:
+    name: Build, smoke and publish image
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:16-bookworm
+        env:
+          POSTGRES_DB: intent_image_ci
+          POSTGRES_USER: intent_image_ci
+          POSTGRES_PASSWORD: ci-only-image-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U intent_image_ci -d intent_image_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Select image tags and publication policy
+        id: image
+        env:
+          DOCKERHUB_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
+          DOCKERHUB_PUBLISH_ENABLED: ${{ vars.DOCKERHUB_PUBLISH_ENABLED }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          MANUAL_PUSH: ${{ inputs.push }}
+        run: node scripts/ci-image-tags.mjs
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+        with:
+          platforms: arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Verify secret-free build context
+        run: node scripts/check-build-context.mjs
+      - name: Build local amd64 image for smoke test
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: intent-crm:ci
+          cache-from: type=gha,scope=intent-image
+          cache-to: type=gha,mode=max,scope=intent-image
+      - name: Verify non-root image with read-only production mounts
+        env:
+          DATABASE_URL: postgresql://intent_image_ci:ci-only-image-password@127.0.0.1:5432/intent_image_ci
+        run: >-
+          docker run --rm --read-only --network host
+          --tmpfs /tmp:mode=1777,size=256m
+          --tmpfs /home/node/.cache:exec,uid=1000,gid=1000,mode=0700,size=128m
+          --env DATABASE_URL
+          --env INTENT_PUBLIC_ORIGIN=https://crm.example.test
+          --env INTENT_AUTH_MODE=password --env INTENT_DEV_AUTH=false
+          --env TEMPORAL_ADDRESS=127.0.0.1:7233
+          --entrypoint node intent-crm:ci --import tsx docker/smoke.mjs
+      - name: Validate publication credentials
+        if: steps.image.outputs.publish == 'true'
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          test -n "$DOCKERHUB_USERNAME" || { echo 'Missing repository secret DOCKERHUB_USERNAME'; exit 1; }
+          test -n "$DOCKERHUB_TOKEN" || { echo 'Missing repository secret DOCKERHUB_TOKEN'; exit 1; }
+      - name: Log in to Docker Hub
+        if: steps.image.outputs.publish == 'true'
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build both architectures and publish when authorized
+        id: release
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ steps.image.outputs.publish == 'true' }}
+          tags: ${{ steps.image.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=intent-image
+          cache-to: type=gha,mode=max,scope=intent-image
+      - name: Report immutable deployment reference
+        if: steps.image.outputs.publish == 'true'
+        env:
+          DOCKERHUB_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
+          IMAGE_DIGEST: ${{ steps.release.outputs.digest }}
+        run: |
+          test -n "$IMAGE_DIGEST"
+          printf 'Published image: `%s@%s`\n' "$DOCKERHUB_IMAGE" "$IMAGE_DIGEST" >> "$GITHUB_STEP_SUMMARY"

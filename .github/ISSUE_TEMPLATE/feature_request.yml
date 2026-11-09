@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest an improvement to a customer or administrator workflow.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: Please search existing issues first and use fictional examples. Do not include customer data.
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: Who encounters the problem, and what are they trying to accomplish?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the expected workflow and what would make the improvement useful.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include existing features or workarounds you tried.

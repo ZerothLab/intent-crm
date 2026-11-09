@@ -1,0 +1,19 @@
+{
+  "name": "@intent/domain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@intent/contracts": "workspace:*",
+    "@intent/database": "workspace:*",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {},
+  "license": "Apache-2.0"
+}

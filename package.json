@@ -1,0 +1,40 @@
+{
+  "name": "intent-crm",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.4.1",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck && tsc --noEmit",
+    "test": "node --env-file-if-exists=.env --import tsx --test --test-concurrency=1 tests/*.test.ts apps/web/test/*.test.ts",
+    "db:migrate": "node --env-file-if-exists=.env --import tsx packages/database/src/migrate.ts",
+    "db:seed": "node --env-file-if-exists=.env --import tsx packages/database/src/seed.ts",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "dev:temporal": "node scripts/temporal-dev.mjs",
+    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "test:acceptance": "node scripts/acceptance.mjs",
+    "start": "node scripts/start.mjs",
+    "admin:bootstrap": "node --env-file-if-exists=.env --import tsx scripts/bootstrap-admin.ts",
+    "test:product-acceptance": "node scripts/product-acceptance.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "esbuild",
+      "protobufjs",
+      "@temporalio/core-bridge"
+    ]
+  },
+  "license": "Apache-2.0"
+}

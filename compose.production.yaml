@@ -1,0 +1,86 @@
+name: intent-crm-production
+
+x-app: &app
+  image: ${INTENT_IMAGE:?Set the published Docker Hub image or digest}
+  init: true
+  read_only: true
+  tmpfs:
+    - /tmp:mode=1777,size=256m
+    # SWC materializes its native payload here; it needs a private executable cache.
+    - /home/node/.cache:exec,uid=1000,gid=1000,mode=0700,size=128m
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  stop_grace_period: 30s
+
+x-environment: &environment
+  DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env.docker}
+  INTENT_PUBLIC_ORIGIN: ${INTENT_PUBLIC_ORIGIN:?Set the exact public HTTPS origin}
+  INTENT_TRUSTED_PROXIES: ${INTENT_TRUSTED_PROXIES:-}
+  TEMPORAL_ADDRESS: ${TEMPORAL_ADDRESS:?Set your private Temporal endpoint}
+  TEMPORAL_NAMESPACE: ${TEMPORAL_NAMESPACE:-default}
+  INTENT_TRANSPORT_OUTCOME: success
+  INTENT_ENCRYPTION_KEY: ${INTENT_ENCRYPTION_KEY:-}
+  INTENT_MODEL_ALLOWED_HOSTS: ${INTENT_MODEL_ALLOWED_HOSTS:-}
+  INTENT_DELIVERY_ALLOWED_HOSTS: ${INTENT_DELIVERY_ALLOWED_HOSTS:-}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-intent_app}
+      POSTGRES_DB: ${POSTGRES_DB:-intent_crm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a database password in .env.docker}
+    volumes: [intent-postgres:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    # Database has no published host port.
+
+  migrate:
+    <<: *app
+    command: [migrate]
+    environment: *environment
+    restart: 'no'
+    healthcheck: {disable: true}
+    depends_on:
+      postgres: {condition: service_healthy}
+
+  api:
+    <<: *app
+    command: [api]
+    environment: *environment
+    restart: unless-stopped
+    ports: ["${INTENT_BIND_IP:-127.0.0.1}:${INTENT_HTTP_PORT:-3100}:3100"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+
+  worker:
+    <<: *app
+    command: [worker]
+    environment: *environment
+    restart: unless-stopped
+    healthcheck: {disable: true}
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+
+  bootstrap:
+    <<: *app
+    profiles: [tools]
+    command: [bootstrap]
+    environment: *environment
+    restart: 'no'
+    healthcheck: {disable: true}
+    depends_on:
+      postgres: {condition: service_healthy}
+    stdin_open: true
+    tty: true
+
+volumes:
+  intent-postgres:
+    # Provision once for a new install, or select the existing volume when upgrading.
+    # Compose must never create a fresh database because a migration volume name was mistyped.
+    name: ${INTENT_POSTGRES_VOLUME:-intent-crm-production_intent-postgres}
+    external: true

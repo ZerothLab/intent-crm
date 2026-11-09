@@ -1,0 +1,21 @@
+name: Usage question
+description: Ask about a workflow or documentation that needs clarification.
+title: "[Question]: "
+body:
+  - type: markdown
+    attributes:
+      value: Check the product, deployment, integration, and upgrade guides first. Never include credentials or customer data.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: Explain the workflow you want to complete and what is unclear.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Documentation and context
+      description: Link the relevant guide section and include your commit or image digest when relevant.
+    validations:
+      required: true
