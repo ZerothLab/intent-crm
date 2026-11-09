@@ -2,7 +2,7 @@
 
 **The AI-native CRM. Understand intent. Move business forward.**
 
-[Website](https://zerothlab.github.io/intent-crm/) · [v0.4.0-rc.1 prerelease](https://github.com/ZerothLab/intent-crm/releases/tag/v0.4.0-rc.1) · [Docker Hub](https://hub.docker.com/r/zerothlab/intent-crm)
+[Website](https://zerothlab.github.io/intent-crm-website/) · [v0.4.0-rc.1 prerelease](https://github.com/ZerothLab/intent-crm/releases/tag/v0.4.0-rc.1) · [Docker Hub](https://hub.docker.com/r/zerothlab/intent-crm)
 
 Intent turns customer evidence into reviewable next steps, then connects approved work to verifiable outcomes. Its assistant keeps private conversation history, cites customer sources, and helps people decide what to do next. Business changes remain explicit, permission-checked commands.
 
