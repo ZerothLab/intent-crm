@@ -24,7 +24,7 @@
     "test:product-acceptance": "node scripts/product-acceptance.mjs"
   },
   "devDependencies": {
-    "@types/node": "^22.15.0",
+    "@types/node": "^26.6.6",
     "tsx": "^4.20.0",
     "typescript": "~5.9.3"
   },
